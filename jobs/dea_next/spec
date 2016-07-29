@@ -37,6 +37,8 @@ properties:
   dea_next.allow_host_access:
     description: "Allows warden containers to access the DEA host via its IP"
     default: false
+  dea_next.firewall_environment:
+    description: nb-config/backends-<env>.yml in app container
   dea_next.disk_mb:
     description:
     default: 32000
@@ -73,6 +75,8 @@ properties:
   dea_next.staging_cpu_limit_shares:
     description: "CPU limit in shares for staging tasks cgroup"
     default: 512
+  dea_next.http_proxy:
+    description: use this info for the http_proxy variable when staging
   dea_next.instance_memory_to_cpu_share_ratio:
     description: "Controls the relationship between app memory and cpu shares. app_cpu_shares = app_memory / cpu_share_factor"
     default: 8
