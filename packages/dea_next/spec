@@ -11,3 +11,4 @@ files:
 - dea_next/{bin,lib,vendor}/**/*
 - dea_next/go/{bin,src,vendor}/**/*
 - dea_next/buildpacks/{bin,lib}/**/*
+- dea_next/firewalls/**/*

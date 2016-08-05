@@ -65,6 +65,10 @@ staging:
     burst: <%= burst %>
 <% end %>
 
+<% if_p("dea_next.http_proxy") do %>
+  http_proxy: <%= p("dea_next.http_proxy") %>
+<% end %>
+
 instance:
   memory_to_cpu_share_ratio: <%= p("dea_next.instance_memory_to_cpu_share_ratio") %>
   min_cpu_share_limit: <%= p("dea_next.instance_min_cpu_share_limit") %>
@@ -91,3 +95,7 @@ cc_url: <%= cc_url.to_s %>
 <% if_p("dea_next.post_setup_hook") do |hook| %>
 post_setup_hook: <%= hook %>
 <% end %>
+
+firewalls:
+  script: /var/vcap/packages/dea_next/firewalls/obtain_firewall_config.rb
+  args: <%= p("dea_next.firewall_environment") %>
