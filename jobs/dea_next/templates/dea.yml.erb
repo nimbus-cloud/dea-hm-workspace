@@ -1,4 +1,11 @@
 ---
+<% if p('dea_next.enable_ssl') %>
+ssl:
+  port: <%= p('dea_next.ssl_port') %>
+  key_file: /var/vcap/jobs/dea_next/config/certs/server.key
+  cert_file: /var/vcap/jobs/dea_next/config/certs/server.crt
+<% end %>
+
 nats_servers:
 <% p("nats.machines").each do |address| %>
   - nats://<%= p("nats.user") %>:<%= p("nats.password") %>@<%= address %>:<%= p("nats.port") %>
@@ -27,18 +34,19 @@ directory_server:
     syslog: vcap.directory_server
     level: <%= p("dea_next.logging_level") %>
 
-domain: <%= p("domain") %>
+domain: <%= p("system_domain") %>
 
 logging:
   file: /var/vcap/sys/log/dea_next/dea_next.log
   level: <%= p("dea_next.logging_level") %>
   syslog: vcap.dea_next
 
-<% if_p("metron_endpoint.host", "metron_endpoint.port") do |host, port| %>
+<% if_p("metron_endpoint.host", "metron_agent.dropsonde_incoming_port") do |host, port| %>
 loggregator:
   router: <%= host %>:<%= port %>
 <% end %>
 
+service_name: <%= "#{name.gsub('_', '-')}-#{spec.index}.dea.service.cf.internal" %>
 index: <%= spec.index %>
 
 intervals:
@@ -87,10 +95,16 @@ placement_properties:
   zone: <%= p("dea_next.zone") %>
 
 <%
-  cc_url = URI.parse(p("cc.srv_api_uri"))
-  cc_url.userinfo = "#{p("cc.internal_api_user")}:#{p("cc.internal_api_password")}"
+  cc_url = URI.parse("http://cloud-controller-ng.service.cf.internal:#{p('cc.external_port')}")
+  cc_url.userinfo = "#{p('cc.internal_api_user')}:#{p('cc.internal_api_password')}"
 %>
 cc_url: <%= cc_url.to_s %>
+
+hm9000:
+  listener_uri: https://listener-hm9000.service.cf.internal:5335
+  key_file: /var/vcap/jobs/dea_next/config/certs/hm9000_client.key
+  cert_file: /var/vcap/jobs/dea_next/config/certs/hm9000_client.crt
+  ca_file: /var/vcap/jobs/dea_next/config/certs/hm9000_ca.crt
 
 <% if_p("dea_next.post_setup_hook") do |hook| %>
 post_setup_hook: <%= hook %>

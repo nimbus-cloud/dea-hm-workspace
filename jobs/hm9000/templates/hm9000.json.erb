@@ -5,15 +5,16 @@
     "cc_auth_password": "<%= p("cc.bulk_api_password") %>",
     "cc_base_url": "<%= p("cc.srv_api_uri") %>",
     "skip_cert_verify": <%= p("ssl.skip_cert_verify") %>,
+
+    "cc_internal_url": "http://cloud-controller-ng.service.cf.internal:<%=p('cc.external_port')%>",
+
     "desired_state_batch_size": <%= p("hm9000.desired_state_batch_size") %>,
     "fetcher_network_timeout_in_seconds": <%= p("hm9000.fetcher_network_timeout_in_seconds") %>,
     "sender_message_limit": <%= p("hm9000.sender_message_limit") %>,
 
     "store_schema_version": 4,
-    "store_urls": [<%= p("etcd.machines").map{|addr| "\"http://#{addr}:4001\""}.join(",")%>],
 
     "log_level": "INFO",
-    "log_directory": "/var/vcap/sys/log/hm9000",
 
     "api_server_address": "0.0.0.0",
     "api_server_port": <%= p("hm9000.port") %>,
@@ -21,6 +22,24 @@
     "api_server_password": "<%= p("cc.internal_api_password") %>",
 
     "dropsonde_port": <%= p("metron_agent.dropsonde_incoming_port") %>,
+
+    "ssl": {
+      "key_file": "/var/vcap/jobs/hm9000/config/certs/server.key",
+      "cert_file": "/var/vcap/jobs/hm9000/config/certs/server.crt",
+      "ca_file": "/var/vcap/jobs/hm9000/config/certs/ca.crt"
+    },
+
+    "etcd_require_ssl": <%= p("hm9000.etcd.require_ssl") %>,
+    <% if p("hm9000.etcd.require_ssl") %>
+    "store_urls": [<%= p("hm9000.etcd.machines").map{|addr| "\"https://#{addr}:4001\""}.join(",")%>],
+    "etcd": {
+        "key_file": "/var/vcap/jobs/hm9000/config/certs/etcd_client.key",
+        "cert_file": "/var/vcap/jobs/hm9000/config/certs/etcd_client.crt",
+        "ca_file": "/var/vcap/jobs/hm9000/config/certs/etcd_ca.crt"
+    },
+    <% else %>
+    "store_urls": [<%= p("hm9000.etcd.machines").map{|addr| "\"http://#{addr}:4001\""}.join(",")%>],
+    <% end %>
 
     "nats": <%=
   p("nats.machines").collect do |addr|

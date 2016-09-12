@@ -34,6 +34,9 @@ case $1 in
     ulimit -c unlimited
     ulimit -n 4096
 
+    # Restrics dmesg access
+    echo 1 > /proc/sys/kernel/dmesg_restrict
+
     <% if p("dea_next.kernel_network_tuning_enabled") == true %>
     # Use default local port range (higher ports are used for pooling)
     echo 32768 61000 > /proc/sys/net/ipv4/ip_local_port_range
@@ -55,9 +58,9 @@ case $1 in
       find $depot -mindepth 1 -maxdepth 1 -type d | xargs -t -n1 --no-run-if-empty root/linux/destroy.sh
     fi
 
-    export PATH=/var/vcap/packages/ruby-2.2.4/bin:$PATH
+    export PATH=/var/vcap/packages/ruby-2.3/bin:$PATH
 
-    exec /var/vcap/packages/ruby-2.2.4/bin/bundle exec \
+    exec /var/vcap/packages/ruby-2.3/bin/bundle exec \
          rake warden:start[$WARDEN_CONF_DIR/warden.yml]
 
     ;;
